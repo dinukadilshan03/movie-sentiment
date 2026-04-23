@@ -1,0 +1,14 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv/
+
+# Large local datasets not suitable for GitHub
+data/rotten_tomatoes_movie_reviews.csv
+data/rotten_tomatoes_movie_reviews_cleaned.csv
