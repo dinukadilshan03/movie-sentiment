@@ -31,7 +31,6 @@ This project now keeps only the 10-day workflow and the curated final dataset bu
 - `audienceScore`
 - `initial_combined_sentiment_score`
 - `log_initial_review_count`
-- `initial_sentiment_x_log_review_count`
 
 ## Modeling choice
 
@@ -41,7 +40,6 @@ Hypothesis testing uses an explainable ordinary least squares model with:
 log(boxOffice) ~ audienceScore
                + initial_combined_sentiment_score
                + log_initial_review_count
-               + initial_sentiment_x_log_review_count
 ```
 
 No black-box models are used in the current workflow.

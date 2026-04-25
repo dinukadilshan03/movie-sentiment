@@ -19,7 +19,6 @@ MODEL_TERMS = [
     "audienceScore",
     "initial_combined_sentiment_score",
     "log_initial_review_count",
-    "initial_sentiment_x_log_review_count",
 ]
 
 
@@ -74,7 +73,6 @@ def fit_ols(model_df: pd.DataFrame) -> tuple[pd.DataFrame, float]:
             model_df["audienceScore"].to_numpy(dtype=float),
             model_df["initial_combined_sentiment_score"].to_numpy(dtype=float),
             model_df["log_initial_review_count"].to_numpy(dtype=float),
-            model_df["initial_sentiment_x_log_review_count"].to_numpy(dtype=float),
         ]
     )
     labels = ["intercept", *MODEL_TERMS]

@@ -2,66 +2,58 @@
 
 ## 1. Assignment Context
 
-This project was completed as the group assignment for the module and follows the required assignment structure:
+This project was completed as the group assignment for the module. It follows the required structure:
 
 - selection of one analytical statement
 - collection and preparation of relevant data
-- justification of the statement using:
-  - descriptive analytics
-  - inferential analytics
-  - predictive analytics
+- justification of the statement using descriptive, inferential, and predictive analytics
 - analysis grounded in statistical modelling principles taught in the module
 
-The work presented in this report is based on **secondary data**, not primary data.
+The work is based on **secondary data**.
 
 ## 2. Selected Analytical Statement
 
-The selected analytical statement for this study is:
+The selected analytical statement is:
 
 **Positive audience reactions improve content popularity.**
 
 For this project:
 
-- **audience reactions** are represented mainly by `audienceScore` and early review-based reaction features
-- **content popularity** is represented by movie box-office performance, modeled as `log_box_office`
-
-This report evaluates whether the statement is supported by the data using descriptive, inferential, and predictive analytics.
+- **audience reactions** are represented mainly by `audienceScore` and early review-based reaction variables
+- **content popularity** is represented by movie box-office performance, modelled as `log_box_office`
 
 ## 3. Data Source and Preparation
 
-### 3.1 Data Source
+The analysis uses a final movie-level dataset stored in `data/final/final.csv`.
 
-The analysis uses secondary Rotten Tomatoes movie and review data processed into a final movie-level dataset stored in:
+The dataset combines movie-level metadata with early review features derived from reviews collected in the first 10 days after theatrical release.
 
-- `data/final/final.csv`
+### 3.1 Cleaning and Feature Construction
 
-The dataset combines movie-level metadata with early review reaction features derived from reviews collected in the first 10 days after theatrical release.
+The data-preparation pipeline includes:
 
-### 3.2 Data Cleaning and Feature Construction
-
-The project includes a structured cleaning and preparation pipeline:
-
-- review text cleaning
+- review-text cleaning
 - movie and review deduplication
-- filtering of reviews to the first 10 days after release
+- filtering reviews to the first 10 days after release
 - construction of early-review sentiment and review-volume features
 - final movie-level dataset creation
 
-The key constructed variables used in later stages are:
+The corrected final workflow uses only retained, explainable variables and excludes direct revenue leakage from predictive modelling.
+
+The key variables used in the final analysis are:
 
 - `audienceScore`
 - `initial_combined_sentiment_score`
 - `log_initial_review_count`
-- `initial_sentiment_x_log_review_count`
 - `log_box_office`
 
-### 3.3 Data Suitability
+### 3.2 Final Dataset Suitability
 
-The final dataset is sufficiently large and complete for the assignment:
+The final dataset contains **4,072 movies and 28 variables**.
 
-- descriptive stage used the final movie-level dataset
-- inferential stage used 3,747 valid observations for regression
-- predictive stage used 3,746 valid observations for prediction
+- descriptive analysis uses the final movie-level dataset
+- inferential analysis uses **3,747** observations
+- predictive analysis uses **3,746** observations
 
 This supports stable descriptive summaries, formal hypothesis testing, and train/test predictive evaluation.
 
@@ -78,18 +70,20 @@ The descriptive analysis showed that:
 - the dataset is generally clean and highly complete for the selected model variables
 - raw box office is strongly right-skewed, so a logged outcome is more appropriate
 - `audienceScore` is broadly distributed and shows meaningful variation across movies
-- early review volume varies strongly across films and is one of the clearest descriptive signals of popularity
-- early sentiment varies substantially, but its descriptive relationship with popularity is weaker and less straightforward
+- `initial_combined_sentiment_score` also varies substantially across films
+- `log_initial_review_count` is one of the clearest descriptive signals of popularity
+
+Key pairwise correlations with `log_box_office` are:
+
+- `log_initial_review_count = 0.6270`
+- `audienceScore = 0.0841`
+- `initial_combined_sentiment_score = -0.1381`
 
 ### 4.3 Descriptive Interpretation
 
-The descriptive stage suggested that:
+The descriptive stage suggests that popularity is more clearly associated with **early attention / review volume** than with sentiment polarity alone.
 
-- popularity is more clearly associated with **early attention / review volume** than with sentiment polarity alone
-- audience score is related to popularity, but only weakly at the simple pairwise level
-- the sentiment variables overlap considerably with each other, especially the raw sentiment score and the interaction term
-
-This stage provided the foundation for the inferential and predictive analyses.
+It also shows that the retained predictors are straightforward to interpret in the corrected workflow.
 
 ## 5. Inferential Analytics
 
@@ -97,39 +91,27 @@ This stage provided the foundation for the inferential and predictive analyses.
 
 The inferential stage tested whether the selected explanatory variables are significantly associated with `log_box_office`.
 
-### 5.2 Methods Used
+### 5.2 Main Inferential Model
 
-The inferential analysis used statistical modelling principles taught in the module, including:
+The corrected inferential model is:
 
-- Pearson and Spearman correlation
-- one-way ANOVA
-- Kruskal-Wallis test
-- Welch t-test
-- Mann-Whitney U test
-- multiple linear regression estimated by Ordinary Least Squares (OLS)
-- ANOVA / overall F-test for regression
-- coefficient significance tests
-- regression assumption checks
+`log_box_office ~ audienceScore + initial_combined_sentiment_score + log_initial_review_count`
 
-### 5.3 Main Inferential Model
+The model is deliberately explainable: OLS provides transparent coefficients, model-level testing, ANOVA-style contribution checks, and assumption diagnostics.
 
-The main inferential model was:
-
-`log_box_office ~ audienceScore + initial_combined_sentiment_score + log_initial_review_count + initial_sentiment_x_log_review_count`
-
-### 5.4 Main Inferential Findings
+### 5.3 Main Inferential Findings
 
 The inferential analysis found that:
 
 - the overall regression model is statistically significant
 - the null hypothesis that the predictors jointly have no relationship with `log_box_office` is rejected
-- all four predictors are statistically significant in the fitted model
+- all three retained predictors are statistically significant in the fitted model
 
 Key model results:
 
-- `R^2 = 0.4382`
-- adjusted `R^2 = 0.4376`
-- overall `F = 681.3789`
+- `R^2 = 0.4318`
+- adjusted `R^2 = 0.4313`
+- overall `F = 888.1409`
 - model `p < 0.001`
 
 Coefficient directions:
@@ -137,37 +119,18 @@ Coefficient directions:
 - `audienceScore`: positive and significant
 - `initial_combined_sentiment_score`: negative and significant
 - `log_initial_review_count`: positive and significant
-- `initial_sentiment_x_log_review_count`: positive and significant
 
-### 5.5 Inferential Interpretation
+### 5.4 Inferential Interpretation
 
 The inferential stage supports the conclusion that audience reaction and early review behavior are significantly related to popularity.
 
-However, the result is **not a simple one-direction sentiment story**:
+The strongest inferential signal comes from `log_initial_review_count`, which suggests that early review attention is a major factor associated with box-office performance.
 
-- audience score has a positive relationship with popularity
-- early review volume is a very strong positive signal
-- the main sentiment coefficient is negative
-- the interaction term is positive, which means the effect of sentiment depends on review volume
+### 5.5 Inferential Limitations
 
-Therefore, the statement is not validated in a simplistic form such as “more positive sentiment always directly increases popularity.” The relationship is more conditional and must be interpreted through the full model.
+The corrected final model has low VIF values for the retained predictors. The main remaining modelling limitation is heteroskedasticity, which is handled by reporting **HC3 robust standard errors**.
 
-### 5.6 Inferential Gaps and Limitations
-
-The inferential analysis also found several modelling limitations:
-
-- heteroskedasticity is present
-- residual normality is imperfect
-- multicollinearity is severe in the raw interaction specification
-- independence is mostly justified by study design rather than fully testable statistically
-
-These issues were handled or documented by:
-
-- using HC3 robust standard errors
-- reporting regression diagnostics
-- adding a centered interaction robustness check
-
-So the inferential analysis is valid and defensible, but the coefficient interpretation requires caution.
+Residual normality is imperfect, but this is less critical given the sample size.
 
 ## 6. Predictive Analytics
 
@@ -175,99 +138,61 @@ So the inferential analysis is valid and defensible, but the coefficient interpr
 
 The predictive stage evaluated how well movie popularity can be predicted on unseen data using an explainable regression workflow.
 
-### 6.2 Methods Used
+### 6.2 Predictive Setup
 
-The predictive analysis followed the model-selection ideas from the lectures and used:
-
-- fixed train/test split
-- 5-fold cross-validation
-- multiple linear regression
-- best-subset selection
-- forward-stepwise selection
-- adjusted `R^2`
-- AIC
-- BIC
-- RMSE
-- MAE
-- test-set `R^2`
-
-### 6.3 Predictive Setup
-
-The predictive target was:
+The predictive target is:
 
 - `log_box_office`
 
-The analysis used:
+The analysis uses:
 
-- 80% training set
-- 20% test set
+- `80%` training data
+- `20%` test data
 - `random_state = 42`
+- `5-fold` cross-validation
 
-Leakage variables were excluded from the predictor set:
+The notebook compares a mean-only baseline, the corrected inferential model, the full candidate-pool model, best-subset selection, and forward-stepwise selection. Model selection is based primarily on training cross-validated RMSE, with test metrics reserved for final evaluation.
 
-- `boxOffice`
-- `box_office_num`
+### 6.3 Main Predictive Findings
 
-### 6.4 Main Predictive Findings
-
-The final predictive model was a **6-variable best-subset selected regression** using:
+The final predictive model is a **5-variable best-subset selected regression** using:
 
 - `audienceScore`
 - `tomatoMeter`
 - `initial_top_critic_review_count`
-- `initial_combined_sentiment_score`
+- `initial_positive_review_ratio`
 - `log_initial_review_count`
-- `initial_sentiment_x_log_review_count`
 
-Its performance was:
+Its performance is:
 
-- cross-validated RMSE = `0.7021`
-- test RMSE = `0.6990`
-- test MAE = `0.5236`
-- test `R^2 = 0.4603`
+- cross-validated RMSE = `0.7055`
+- test RMSE = `0.7037`
+- test MAE = `0.5308`
+- test `R^2 = 0.4529`
 
-This means the final predictive model explains about **46% of the variation** in `log_box_office` on unseen test data.
+This means the final predictive model explains about **45% of the variation** in `log_box_office` on unseen test data.
 
-### 6.5 Predictive Interpretation
+Forward-stepwise selection reaches the same five-feature result, which supports the stability of the selected model.
 
-The predictive stage showed that:
+### 6.4 Predictive Interpretation
+
+The predictive stage shows that:
 
 - the selected reaction and review variables contain real predictive information
 - the predictive model performs much better than a mean-only baseline
-- the inferential four-variable model is useful, but not the strongest predictive model
-- the best-subset and forward-stepwise procedures both point to the same six-feature solution
-- overfitting is not strongly indicated, because cross-validation error and test error are very close
+- the corrected inferential three-variable model is useful, but not the strongest predictive model
+- best-subset and forward-stepwise selection both identify the same final five-feature combination
 
 The strongest predictive signals come from:
 
 - early review volume
-- the sentiment × review-volume interaction
-- critic score
-- then audience score and related reaction variables
+- audience and critic scores
+- early top-critic attention
+- early positive-review share
 
-### 6.6 Predictive Gaps and Limitations
+## 7. Overall Justification of the Statement
 
-The predictive model is meaningful but not perfect.
-
-The notebook shows that:
-
-- some movies are predicted very accurately
-- some movies have very large absolute prediction errors
-
-This is expected because box office may also be influenced by factors not captured in the dataset, such as:
-
-- marketing intensity
-- franchise power
-- release timing
-- platform strategy
-- distribution scale
-- broader audience behavior
-
-So the predictive model is useful, but it does not explain all variation in popularity.
-
-## 7. Overall Justification of the Selected Statement
-
-The assignment required the selected statement to be justified using descriptive, inferential, and predictive analytics. Taken together, the three stages provide the following conclusion.
+Taken together, the descriptive, inferential, and predictive stages support the following conclusion.
 
 ### 7.1 What the Project Supports
 
@@ -277,15 +202,7 @@ The project supports that:
 - early review behavior is strongly related to popularity
 - popularity can be predicted to a meaningful extent using audience and early-review features
 
-### 7.2 What the Project Does Not Support in a Simple Form
-
-The project does **not** support an oversimplified claim that:
-
-- “positive sentiment alone directly and uniformly increases popularity”
-
-That is not what the inferential model found.
-
-### 7.3 Final Verdict on the Statement
+### 7.2 Final Verdict
 
 The selected statement is best judged as:
 
@@ -295,77 +212,15 @@ This is the most statistically accurate conclusion because:
 
 - `audienceScore` is positively associated with popularity
 - early review volume is a strong positive factor
-- prediction improves meaningfully when reaction-related variables are used
-- but the sentiment effects are mixed and interaction-dependent rather than uniformly positive
+- predictive performance improves meaningfully when reaction-related variables are used
+- the strongest consistent signal across the analysis is early attention rather than sentiment alone
 
-So the overall assignment conclusion should be:
+## 8. Final Conclusion
 
-**Positive audience reactions and early review behavior are meaningfully associated with content popularity, but the evidence suggests a conditional and multi-factor relationship rather than a simple direct positive effect of sentiment alone.**
+This assignment completes the required descriptive, inferential, and predictive workflow using lecture-aligned statistical modelling techniques.
 
-## 8. Alignment with Assignment Requirements
+The corrected final workflow uses a simpler retained predictor set with low VIF values and a clearer interpretation.
 
-### 8.1 Required Components
+The final academically defensible conclusion is:
 
-The assignment asked for:
-
-- one analytical statement
-- relevant data collection
-- descriptive analytics
-- inferential analytics
-- predictive analytics
-- justification based strictly on module-taught statistical modelling principles
-
-This project satisfies those requirements as follows:
-
-- **Analytical statement selected**: yes
-- **Relevant data collected and prepared**: yes, using secondary Rotten Tomatoes data
-- **Descriptive analytics completed**: yes
-- **Inferential analytics completed**: yes
-- **Predictive analytics completed**: yes
-- **Use of taught statistical modelling methods**: yes
-
-### 8.2 Learning Outcomes Alignment
-
-The project also aligns well with the learning outcomes listed in the assignment brief:
-
-- **LO1 / LO4**: data collection, cleaning, and preparation
-- **LO2 / LO3 / LO4**: descriptive and inferential statistical analysis
-- **LO3 / LO5**: predictive modelling and model comparison
-- **LO2 / LO6**: interpretation and justification of findings
-- **LO1–LO6**: viva defense of methods, assumptions, findings, and limitations
-
-### 8.3 Bloom’s Taxonomy Alignment
-
-The assignment emphasized Apply, Analyze, and Evaluate. This project demonstrates those levels clearly:
-
-- **Apply**: data cleaning, feature creation, and use of taught models
-- **Analyze**: descriptive, inferential, and predictive comparisons
-- **Evaluate**: model diagnostics, feature selection, limitations, and final judgment on the statement
-
-## 9. Gaps and Final Improvements Needed for Presentation/Viva
-
-The technical work is complete, but for presentation and viva the following points should be stated clearly:
-
-- this study uses **secondary data**
-- the selected analytical statement should be shown explicitly on the slides
-- the final conclusion should be presented as **qualified support**, not absolute proof
-- the difference between descriptive, inferential, and predictive results should be explained clearly
-- the limitations should be acknowledged openly:
-  - multicollinearity
-  - heteroskedasticity
-  - omitted commercial factors
-  - imperfect prediction for unusual films
-
-These are not failures of the assignment. They strengthen the defense because they show critical statistical evaluation rather than overclaiming.
-
-## 10. Final Conclusion
-
-This assignment successfully completes the required descriptive, inferential, and predictive analytics workflow using statistical modelling techniques taught in the module.
-
-The project shows that movie popularity can be meaningfully studied and predicted using audience reaction, critic reaction, and early review behavior. The strongest consistent signal across the analysis is early review volume, while audience score also contributes positively. However, the effect of sentiment is more complex than a simple direct positive relationship.
-
-Therefore, the final academically defensible conclusion is:
-
-**The selected statement is supported with qualification rather than fully proven in a simple form.**
-
-This conclusion is well aligned with the assignment requirements and is grounded in the statistical evidence generated throughout the project.
+**Positive audience reactions and early review behavior are meaningfully associated with content popularity, but the strongest evidence points to early review volume as the clearest signal of popularity.**

@@ -1,145 +1,112 @@
 # Presentation Summary
 
-## Project Title
+## 1. Project Focus
 
-**Do positive audience reactions improve content popularity?**
+This project evaluates the statement:
 
-This project evaluates that statement using descriptive, inferential, and predictive analytics on a secondary Rotten Tomatoes movie dataset.
+**Positive audience reactions improve content popularity.**
 
-## 1. Assignment Alignment
+The study uses descriptive, inferential, and predictive analytics on a secondary Rotten Tomatoes movie dataset.
 
-- Analytical statement selected: yes
-- Relevant data collected: yes, using secondary data
-- Descriptive analytics completed: yes
-- Inferential analytics completed: yes
-- Predictive analytics completed: yes
-- Methods based on module statistical modelling lectures: yes
+## 2. Data and Variables
 
-## 2. Data Used
-
-- Source: secondary Rotten Tomatoes movie and review data
 - Final dataset: `data/final/final.csv`
-- Raw dataset size: `4,072` movies and `29` variables
+- Final dataset size: `4,072` movies and `28` variables
 - Inferential sample: `3,747`
 - Predictive sample: `3,746`
+- Outcome variable: `log_box_office`
+
+Main retained explanatory variables:
+
+- `audienceScore`
+- `initial_combined_sentiment_score`
+- `log_initial_review_count`
 
 ## 3. Descriptive Analytics
 
 Main descriptive findings:
 
-- raw box office is strongly right-skewed
-- `log_box_office` is more suitable for modelling
-- `audienceScore` varies meaningfully across films
-- early review volume is the strongest simple descriptive signal of popularity
-- early sentiment is important, but its descriptive relationship with popularity is mixed
+- raw box office is strongly right-skewed, so `log_box_office` is more suitable for analysis
+- `audienceScore`, early sentiment, and early review volume all vary meaningfully across movies
+- the clearest simple descriptive relationship with popularity is `log_initial_review_count`
+
+Key descriptive correlations with `log_box_office`:
+
+- `log_initial_review_count = 0.6270`
+- `audienceScore = 0.0841`
+- `initial_combined_sentiment_score = -0.1381`
 
 Descriptive conclusion:
 
-- popularity appears to be related more clearly to early attention and review volume than to sentiment polarity alone
+- popularity is linked more clearly to **early attention** than to sentiment alone
 
 ## 4. Inferential Analytics
 
-Main inferential model:
+Corrected inferential model:
 
-`log_box_office ~ audienceScore + initial_combined_sentiment_score + log_initial_review_count + initial_sentiment_x_log_review_count`
+`log_box_office ~ audienceScore + initial_combined_sentiment_score + log_initial_review_count`
 
-Main inferential results:
+Method:
 
-- overall model significant
-- `R^2 = 0.4382`
-- adjusted `R^2 = 0.4376`
-- `F = 681.3789`
-- `p < 0.001`
+- explainable OLS regression
+- HC3 robust standard errors
+- VIF and residual diagnostics
+
+Main results:
+
+- `R^2 = 0.4318`
+- adjusted `R^2 = 0.4313`
+- overall `F = 888.1409`
+- model `p < 0.001`
 
 Coefficient directions:
 
 - `audienceScore`: positive and significant
 - `initial_combined_sentiment_score`: negative and significant
 - `log_initial_review_count`: positive and significant
-- `initial_sentiment_x_log_review_count`: positive and significant
 
 Inferential conclusion:
 
-- audience reaction and early review behavior are significantly associated with popularity
-- the effect of sentiment is conditional, not uniformly positive
+- the corrected regression model is statistically significant, and early review volume is the strongest signal in the model
 
 ## 5. Predictive Analytics
 
-Predictive goal:
-
-- predict `log_box_office` on unseen data using explainable regression
-
 Predictive setup:
 
-- 80/20 train-test split
+- `80/20` train-test split
 - `random_state = 42`
-- 5-fold cross-validation
-- best-subset and forward-stepwise model selection
+- `5-fold` cross-validation
 
-Final selected model:
-
-- 6-variable best-subset regression
-
-Predictors:
+Final selected predictive model:
 
 - `audienceScore`
 - `tomatoMeter`
 - `initial_top_critic_review_count`
-- `initial_combined_sentiment_score`
+- `initial_positive_review_ratio`
 - `log_initial_review_count`
-- `initial_sentiment_x_log_review_count`
+
+Selection method:
+
+- compare baseline, inferential, full, best-subset, and forward-stepwise models
+- select by cross-validated RMSE, with test-set metrics for final evaluation
 
 Predictive performance:
 
-- cross-validated RMSE = `0.7021`
-- test RMSE = `0.6990`
-- test MAE = `0.5236`
-- test `R^2 = 0.4603`
+- cross-validated RMSE = `0.7055`
+- test RMSE = `0.7037`
+- test MAE = `0.5308`
+- test `R^2 = 0.4529`
 
 Predictive conclusion:
 
-- movie popularity can be predicted to a meaningful extent using a compact, interpretable regression model
+- the final predictive model explains about **45%** of the variation in unseen `log_box_office`
 
-## 6. Final Verdict on the Statement
+## 6. Final Conclusion
 
-The statement:
+The project supports the statement only with qualification.
 
-**Positive audience reactions improve content popularity**
+- `audienceScore` is positively associated with popularity
+- early review volume is the strongest and most consistent signal
+- early sentiment is relevant, but not in a simple uniformly positive way
 
-is best judged as:
-
-**Supported with qualification**
-
-Reason:
-
-- audience score is positively associated with popularity
-- early review volume is a strong positive signal
-- predictive models improve clearly when reaction-related variables are included
-- but sentiment alone does not show a simple uniform positive effect
-
-Final conclusion:
-
-**Audience reactions and early review behavior are meaningfully associated with content popularity, but the relationship is conditional and multi-factor rather than a simple direct positive effect of sentiment alone.**
-
-## 7. Key Gaps and Limitations
-
-- heteroskedasticity in the inferential model
-- multicollinearity in the raw interaction specification
-- residual normality is imperfect
-- independence is mainly justified by study design
-- predictive errors remain large for some unusual films
-- box office is also influenced by omitted factors such as marketing, franchise strength, and release strategy
-
-## 8. Viva Defense Points
-
-- This is a **secondary data** study.
-- The assignment required descriptive, inferential, and predictive analytics, and all three were completed.
-- The analysis used statistical modelling methods taught in the module:
-  - correlation
-  - ANOVA
-  - hypothesis testing
-  - multiple linear regression / OLS
-  - feature selection
-  - predictive model evaluation
-- The final conclusion is intentionally qualified because the evidence is statistically mixed across sentiment-related variables.
-- Not overclaiming is a strength, not a weakness, because it reflects correct statistical interpretation.
+The corrected final workflow uses a simpler retained predictor set with low VIF values and clearer interpretation.

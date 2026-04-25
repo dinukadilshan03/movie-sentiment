@@ -182,9 +182,6 @@ def build_sentiment_features(reviews_df: pd.DataFrame) -> pd.DataFrame:
     aggregated["log_initial_review_count"] = aggregated["initial_review_count"].map(
         lambda value: math.log1p(value)
     )
-    aggregated["initial_sentiment_x_log_review_count"] = (
-        aggregated["initial_combined_sentiment_score"] * aggregated["log_initial_review_count"]
-    )
 
     return aggregated[
         [
@@ -197,7 +194,6 @@ def build_sentiment_features(reviews_df: pd.DataFrame) -> pd.DataFrame:
             "initial_combined_sentiment_score",
             "initial_combined_sentiment_label",
             "log_initial_review_count",
-            "initial_sentiment_x_log_review_count",
             "first_review_date",
             "last_review_date_in_window",
         ]

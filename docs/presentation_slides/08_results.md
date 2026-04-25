@@ -3,15 +3,15 @@
 ## Present These Points
 
 - Descriptive analysis showed that **early review volume** is the clearest signal of popularity
-- Inferential analysis showed the regression model is significant and explains **43.8%** of variation in `log_box_office`
-- Predictive analysis achieved meaningful performance on unseen data
+- Inferential analysis showed the corrected regression model is significant and explains **43.2%** of variation in `log_box_office`
+- Predictive analysis achieved meaningful performance on unseen data with a compact 5-feature model
 
 ## Predictive Performance
 
-- Cross-validated RMSE = **0.7021**
-- Test RMSE = **0.6990**
-- Test MAE = **0.5236**
-- Test `R^2 = 0.4603`
+- Cross-validated RMSE = **0.7055**
+- Test RMSE = **0.7037**
+- Test MAE = **0.5308**
+- Test `R^2 = 0.4529`
 
 ## Key Message
 
